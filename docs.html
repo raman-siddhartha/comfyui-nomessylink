@@ -1,0 +1,563 @@
+<!doctype html>
+<title>No Messy Link</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#14171d;
+    --surface:#1b1f27;
+    --surface-2:#20252e;
+    --border:#2b303b;
+    --text:#e7e9ee;
+    --muted:#909aad;
+    --muted-2:#6d7688;
+    --send:#e0954f;
+    --send-dim:#4a3626;
+    --receive:#4f8fe0;
+    --receive-dim:#243449;
+    --danger:#c0524a;
+    --amber:#c99a3f;
+    --code-bg:#11141a;
+    --shadow: 0 1px 0 rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f6f3;
+    --surface:#ffffff;
+    --surface-2:#f0eee9;
+    --border:#e1ded6;
+    --text:#22252b;
+    --muted:#5b6270;
+    --muted-2:#848c99;
+    --send:#b5651d;
+    --send-dim:#f4e0cc;
+    --receive:#2f5fa8;
+    --receive-dim:#dbe6f6;
+    --danger:#a83c34;
+    --amber:#8a6a1f;
+    --code-bg:#eeece6;
+    --shadow: 0 1px 0 rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f7f6f3;
+      --surface:#ffffff;
+      --surface-2:#f0eee9;
+      --border:#e1ded6;
+      --text:#22252b;
+      --muted:#5b6270;
+      --muted-2:#848c99;
+      --send:#b5651d;
+      --send-dim:#f4e0cc;
+      --receive:#2f5fa8;
+      --receive-dim:#dbe6f6;
+      --danger:#a83c34;
+      --amber:#8a6a1f;
+      --code-bg:#eeece6;
+      --shadow: 0 1px 0 rgba(0,0,0,.06);
+    }
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:15.5px;
+    line-height:1.65;
+    padding-inline:20px;
+  }
+  code, .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; }
+
+  a{ color:var(--receive); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  a:focus-visible, button:focus-visible, summary:focus-visible{
+    outline:2px solid var(--receive); outline-offset:2px;
+  }
+
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:230px minmax(0,1fr);
+    gap:48px;
+  }
+
+  /* ---- top banner ---- */
+  header.hero{
+    padding-block:40px 28px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:8px;
+  }
+  .hero-inner{ max-width:1180px; margin:0 auto; }
+  .eyebrow{
+    font-family:"IBM Plex Mono";
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow .dot-send{width:7px;height:7px;border-radius:50%;background:var(--send);box-shadow:0 0 0 3px var(--send-dim);}
+  .eyebrow .dot-receive{width:7px;height:7px;border-radius:50%;background:var(--receive);box-shadow:0 0 0 3px var(--receive-dim);}
+  h1.title{
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.1;
+    margin:0 0 14px;
+    text-wrap:balance;
+    font-weight:700;
+  }
+  .tagline{
+    max-width:62ch;
+    color:var(--muted);
+    font-size:16.5px;
+    margin:0 0 20px;
+  }
+  .hero-diagram{
+    display:flex;
+    align-items:center;
+    gap:0;
+    margin-top:22px;
+    font-family:"IBM Plex Mono";
+    font-size:13px;
+  }
+  .node-chip{
+    border:1px solid var(--border);
+    background:var(--surface);
+    border-radius:8px;
+    padding:10px 16px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:120px;
+  }
+  .node-chip .kind{ font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-2); }
+  .node-chip.send{ border-top:2px solid var(--send); }
+  .node-chip.send .name{ color:var(--send); }
+  .node-chip.receive{ border-top:2px solid var(--receive); }
+  .node-chip.receive .name{ color:var(--receive); }
+  .hero-link{
+    flex:1;
+    min-width:32px;
+    height:1px;
+    background:repeating-linear-gradient(to right, var(--muted-2) 0 6px, transparent 6px 12px);
+    position:relative;
+    margin-inline:2px;
+  }
+  .hero-link::after{
+    content:"hover to reveal";
+    position:absolute;
+    top:-22px; left:50%; transform:translateX(-50%);
+    font-size:10px; color:var(--muted-2); white-space:nowrap;
+    letter-spacing:.02em;
+  }
+
+  /* ---- nav ---- */
+  nav.toc{
+    position:sticky;
+    top:calc(env(safe-area-inset-top,0px) + 24px);
+    align-self:start;
+    padding-top:32px;
+    max-height:calc(100vh - 48px);
+    overflow-y:auto;
+  }
+  nav.toc .group-label{
+    font-family:"IBM Plex Mono";
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin:18px 0 8px;
+  }
+  nav.toc .group-label:first-child{ margin-top:0; }
+  nav.toc ul{ list-style:none; margin:0; padding:0; }
+  nav.toc li a{
+    display:block;
+    padding:5px 0 5px 12px;
+    border-left:2px solid transparent;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+  nav.toc li a:hover{ color:var(--text); text-decoration:none; }
+  nav.toc li a.active{
+    color:var(--text);
+    border-left-color:var(--receive);
+    font-weight:500;
+  }
+
+  /* ---- main content ---- */
+  main{ padding-block:32px 80px; min-width:0; }
+  section{ margin-bottom:52px; scroll-margin-top:24px; }
+  section h2{
+    font-size:22px;
+    margin:0 0 6px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+  }
+  section > .section-intro{ color:var(--muted); margin:14px 0 18px; max-width:68ch; }
+  h3.node-heading{
+    font-family:"IBM Plex Mono";
+    font-size:16px;
+    margin:36px 0 4px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h3.node-heading .swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+  h3.node-heading.send .swatch{ background:var(--send); }
+  h3.node-heading.receive .swatch{ background:var(--receive); }
+  h3.node-heading.multi .swatch{ background:linear-gradient(135deg,var(--send) 50%,var(--receive) 50%); }
+  h3.node-heading.mix .swatch{ background:var(--receive); border-radius:50%; }
+
+  p{ margin:0 0 12px; max-width:68ch; }
+  ul, ol{ margin:0 0 14px; padding-left:22px; max-width:66ch; }
+  li{ margin-bottom:6px; }
+  li::marker{ color:var(--muted-2); }
+
+  code:not(pre code){
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1px 6px;
+    font-size:.88em;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  pre code{ background:none; border:none; padding:0; }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:"IBM Plex Mono";
+    font-size:12px;
+    padding:3px 9px 3px 8px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    white-space:nowrap;
+  }
+  .badge.status-full{ color:var(--danger); border-color:color-mix(in srgb, var(--danger) 40%, var(--border)); }
+  .badge.status-full .dot{ background:var(--danger); }
+  .badge.status-partial{ color:var(--amber); border-color:color-mix(in srgb, var(--amber) 40%, var(--border)); }
+  .badge.status-partial .dot{ background:var(--amber); }
+  .badge.status-ok{ color:var(--muted); }
+  .badge.status-ok .dot{ background:var(--muted-2); }
+  .badge .dot{ width:6px; height:6px; border-radius:50%; flex:none; }
+
+  .status-table{ display:grid; gap:10px; margin:16px 0 20px; }
+  .status-row{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    gap:14px;
+    align-items:start;
+    padding:12px 14px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+  }
+  .status-row .label{ font-size:13px; color:var(--muted); }
+  .status-row p{ margin:0; font-size:14px; }
+
+  .steps{ counter-reset:step; list-style:none; padding:0; margin:0 0 14px; }
+  .steps li{
+    counter-increment:step;
+    position:relative;
+    padding-left:38px;
+    margin-bottom:14px;
+  }
+  .steps li::before{
+    content:counter(step);
+    position:absolute; left:0; top:-1px;
+    width:26px; height:26px;
+    border-radius:6px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono"; font-size:12px; color:var(--muted);
+  }
+
+  .callout{
+    border:1px solid var(--border);
+    border-left:3px solid var(--receive);
+    background:var(--surface);
+    border-radius:0 8px 8px 0;
+    padding:12px 16px;
+    margin:16px 0;
+    font-size:14px;
+  }
+  .callout.warn{ border-left-color:var(--amber); }
+  .callout p:last-child{ margin-bottom:0; }
+  .callout .callout-label{
+    font-family:"IBM Plex Mono"; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted-2); margin-bottom:6px; display:block;
+  }
+
+  .card-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:16px 0 20px; }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+  }
+  .card h4{ margin:0 0 8px; font-size:14px; font-family:"IBM Plex Mono"; }
+  .card p{ margin:0; font-size:13.5px; color:var(--muted); }
+
+  .arch-note{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    margin-bottom:14px;
+  }
+  .arch-note .tag{
+    font-family:"IBM Plex Mono"; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--muted-2); white-space:nowrap; padding-top:2px; min-width:118px;
+  }
+  .arch-note p{ margin:0; font-size:14px; }
+
+  footer{
+    max-width:1180px; margin:0 auto; padding-block:28px 60px;
+    border-top:1px solid var(--border);
+    color:var(--muted-2); font-size:13px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  @media (max-width:860px){
+    .shell{ grid-template-columns:1fr; }
+    nav.toc{
+      position:static; max-height:none; padding-top:0;
+      border-bottom:1px solid var(--border);
+      margin-bottom:8px; padding-bottom:14px;
+    }
+    nav.toc ul{ display:flex; flex-wrap:wrap; gap:2px 14px; }
+    nav.toc li a{ padding:4px 0; border-left:none; }
+    nav.toc li a.active{ border-left:none; text-decoration:underline; }
+    .status-row{ grid-template-columns:1fr; }
+    .arch-note{ flex-direction:column; gap:4px; }
+  }
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow"><span class="dot-send"></span> ComfyUI custom node pack <span class="dot-receive"></span></div>
+    <h1 class="title">No Messy Link</h1>
+    <p class="tagline">Connect nodes without drawing a noodle across the graph. The link stays invisible until you hover either end — then it appears as a dashed line, labeled with exactly which node it's paired to.</p>
+    <div class="hero-diagram">
+      <div class="node-chip send">
+        <span class="kind">Send</span>
+        <span class="name">Load Checkpoint → MODEL</span>
+      </div>
+      <div class="hero-link"></div>
+      <div class="node-chip receive">
+        <span class="kind">Receive</span>
+        <span class="name">Load Checkpoint → MODEL</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <div class="group-label">Start here</div>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#install">Installation</a></li>
+    </ul>
+    <div class="group-label">Node types</div>
+    <ul>
+      <li><a href="#send-receive">Send / Receive</a></li>
+      <li><a href="#multi">MultiSend / MultiReceive</a></li>
+      <li><a href="#mix">MixReceive</a></li>
+    </ul>
+    <div class="group-label">Behavior</div>
+    <ul>
+      <li><a href="#hidden-link">Hidden-link behavior</a></li>
+      <li><a href="#styling">Connection-status styling</a></li>
+      <li><a href="#paste">Copy/paste &amp; saved workflows</a></li>
+      <li><a href="#limitation">Known limitation</a></li>
+    </ul>
+    <div class="group-label">Reference</div>
+    <ul>
+      <li><a href="#dev-notes">Developer notes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p class="section-intro">No GPU or model work here — this is pure graph/canvas UI. Each node is a transparent passthrough (value in, value out, unchanged); ComfyUI's own engine still handles execution order and workflow saving normally.</p>
+      <p>Every connector always shows, in plain text, which node it's paired with, plus a one-click button to jump (pan) the canvas straight to it — you never have to guess which two nodes a hidden pair belongs to.</p>
+    </section>
+
+    <section id="install">
+      <h2>Installation</h2>
+      <ol class="steps">
+        <li><p>Copy this folder into your ComfyUI <code>custom_nodes/</code> directory.</p></li>
+        <li><p>Restart the ComfyUI server — new node types only register at startup, a browser refresh alone is not enough.</p></li>
+        <li><p>The nodes appear under the <strong>utils/no_messy_link</strong> category in the node search, named <code>No Messy Link (Send)</code>, <code>(Receive)</code>, <code>(MultiSend)</code>, <code>(MultiReceive)</code>, <code>(MixReceive)</code>.</p></li>
+      </ol>
+      <p>No Python dependencies beyond ComfyUI itself.</p>
+    </section>
+
+    <section id="send-receive">
+      <h2>Node types</h2>
+
+      <h3 class="node-heading send"><span class="swatch"></span>No Messy Link (Send) / (Receive)</h3>
+      <p class="section-intro">One value in, one value out, one hidden link between them.</p>
+      <ul>
+        <li>Add a <strong>Send</strong> node and a paired <strong>Receive</strong> node is auto-created and auto-connected 220px to its right — no manual wiring needed for the common case.</li>
+        <li>A <strong>Send</strong> can feed <em>any number</em> of Receive nodes (fan-out). A <strong>Receive</strong> always takes from exactly one Send.</li>
+        <li><strong>Receive</strong> has a "Connect to Send" dropdown listing every Send in the graph (plus individual slots of any MultiSend) — pick one to rewire.</li>
+        <li><strong>Send</strong> has a "Jump to Receive" dropdown listing every Receive it currently feeds; picking one pans the canvas to it (zoom unchanged).</li>
+        <li>Both nodes have an editable <strong>Name</strong> text widget. Leave it blank and the name auto-generates: <code>&lt;upstream node title&gt; → &lt;TYPE&gt;</code> on Send, mirrored on Receive. Type it in and that name is used everywhere instead.</li>
+        <li>Node title is always prefixed with its kind: <code>Send · &lt;name&gt;</code> / <code>Receive · &lt;name&gt;</code>.</li>
+        <li>Once a value is connected, both sockets and both node bodies recolor to that data type's native ComfyUI color (e.g. yellow for CLIP, purple for MODEL). A small accent square (orange on Send, blue on Receive) stays constant regardless of type color, so you can always tell which is which.</li>
+        <li>Send also has a <strong>"+ New Receive"</strong> button — spawns and connects a fresh Receive at any time (e.g. to recover one you deleted, or add another for fan-out), independent of the auto-spawn-on-add behavior.</li>
+      </ul>
+    </section>
+
+    <section id="multi">
+      <h3 class="node-heading multi"><span class="swatch"></span>No Messy Link (MultiSend) / (MultiReceive)</h3>
+      <p class="section-intro">Like Send/Receive, but one node carries several independent value slots (<code>value_1</code>, <code>value_2</code>, …), each its own hidden link with its own type — not one value fanned out.</p>
+      <ul>
+        <li>Slots auto-expand: connect the last empty slot and a new empty one appears below it; disconnect it and the trailing empty slot is removed. Capped at 20 slots.</li>
+        <li>Adding a MultiSend auto-spawns a paired MultiReceive, same as the plain pair.</li>
+        <li><strong>MultiReceive</strong> always mirrors <em>every</em> currently-connected slot of its paired MultiSend — no picking, it's an all-or-nothing mirror. Use the regular <strong>Receive</strong> node if you only want one specific slot.</li>
+        <li>MultiSend has a <strong>"+ New MultiReceive"</strong> recovery button, same purpose as Send's.</li>
+      </ul>
+    </section>
+
+    <section id="mix">
+      <h3 class="node-heading mix"><span class="swatch"></span>No Messy Link (MixReceive)</h3>
+      <p class="section-intro">An auto-expanding multi-slot receiver like MultiReceive, but each slot is wired independently — potentially to a different source each (a plain Send, or one specific slot of any MultiSend). No pairing, no auto-spawn: always added standalone.</p>
+      <ul>
+        <li>One "Connect to Send" dropdown fills whichever slot is currently the trailing empty one; picking an entry repeatedly fills slots one at a time.</li>
+        <li>Jump buttons are deduplicated by origin node — one button per unique source feeding this node, labeled with the slot name(s) only when needed to tell apart multiple slots from the same origin.</li>
+      </ul>
+    </section>
+
+    <section id="hidden-link">
+      <h2>Hidden-link behavior</h2>
+      <p class="section-intro">Applies to all node types.</p>
+      <ul>
+        <li>A link is invisible by default. Hover <strong>either</strong> endpoint and it draws as a dashed line for as long as the hover lasts.</li>
+        <li>This also applies to a link wired <strong>directly</strong> into a Receive / MultiReceive / MixReceive slot from an ordinary node, bypassing Send entirely — it hides and reveals the same way.</li>
+        <li>Every socket's label mirrors the name of whatever it's actually connected to on the other end (e.g. "positive"/"negative" when feeding an Apply ControlNet node) instead of showing a generic type name, so you can read intent at a glance without revealing the link.</li>
+      </ul>
+    </section>
+
+    <section id="styling">
+      <h2>Connection-status styling</h2>
+      <div class="status-table">
+        <div class="status-row">
+          <span class="badge status-full"><span class="dot"></span>Not Connected</span>
+          <p>No links on any socket. Node turns dark red, title prefixed <code>Not Connected ·</code>.</p>
+        </div>
+        <div class="status-row">
+          <span class="badge status-partial"><span class="dot"></span>Partially connected</span>
+          <p>One side has a link, the other doesn't. Node turns muted amber, title prefixed <code>Input Not Connected ·</code> or <code>Output Not Connected ·</code> depending on which side is missing.</p>
+        </div>
+        <div class="status-row">
+          <span class="badge status-ok"><span class="dot"></span>Fully connected</span>
+          <p>Normal type-driven coloring, as described under Send/Receive above.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="paste">
+      <h2>Copy/paste and saved workflows</h2>
+      <ul>
+        <li>Cutting/copying and pasting a Send, Receive, MultiSend, MultiReceive, or MixReceive re-establishes its original connections automatically — you don't need to rewire after a paste.</li>
+        <li>Saved workflow JSON round-trips normally: reload a workflow and every hidden link, name, and slot is restored exactly as saved.</li>
+        <li>Works inside "Convert to Subgraph" / "Unpack Subgraph" without breaking a pairing that spans the subgraph boundary.</li>
+      </ul>
+    </section>
+
+    <section id="limitation">
+      <h2>Known limitation</h2>
+      <div class="callout warn">
+        <span class="callout-label">Panel clicks don't fire</span>
+        <p>The "+ New Receive" / "+ New MultiReceive" buttons and the plain jump buttons (Receive/MultiReceive/MixReceive) only work when clicked <strong>on the canvas</strong>. ComfyUI's properties side panel does not wire click events for this widget type at all — this is a panel-level limitation, not specific to this extension. Dropdown/text widgets work fine from the panel.</p>
+      </div>
+    </section>
+
+    <section id="dev-notes">
+      <h2>Developer notes</h2>
+      <p class="section-intro">For anyone maintaining or extending this pack.</p>
+
+      <div class="arch-note">
+        <span class="tag">Architecture</span>
+        <p>Everything happens in one frontend extension file, <code>web/no_messy_link.js</code>, registered via <code>app.registerExtension</code> against each node type's <code>beforeRegisterNodeDef</code>/prototype. The Python side (<code>nodes.py</code>) is deliberately inert: every node is a pure passthrough using a wildcard <code>AnyType</code> (<code>"*"</code> that compares equal to any type string), so it accepts/emits any ComfyUI data type without per-type Python logic. All hide/reveal, coloring, naming, and pairing logic lives in JS, hooking LiteGraph's documented extension points only — no core ComfyUI files are patched. Two exceptions patch <strong>live instances</strong>, not prototypes/core files: <code>app.canvas.onNodeMoved</code> (drag-end detection) and a canvas-level overlay hook for drawing the dashed pairing line between an unconnected-but-paired Multi pair — both instance-level because this ComfyUI build declares those canvas callback slots as class fields, which shadow prototype patches.</p>
+      </div>
+
+      <div class="arch-note">
+        <span class="tag">Multi-slot expand</span>
+        <p>MultiSend/MultiReceive/MixReceive all share the same grow/shrink logic (<code>growShrinkMultiSlots</code>): always exactly one trailing empty slot, added/removed every frame based on live link state. Backend cap is 20 slots (<code>MULTI_MAX_SLOTS</code> in <code>nodes.py</code>) since <code>RETURN_TYPES</code> can't grow per-instance in Python — only however many slots are actually in use get wired/shown on the frontend.</p>
+      </div>
+
+      <div class="arch-note">
+        <span class="tag">Type resolution</span>
+        <p>Because our own nodes are wildcard-typed, a naive read of a link's <code>.type</code> returns <code>"*"</code> whenever the upstream is itself one of our nodes. <code>resolveRealType</code>/<code>resolveRealOrigin</code> recurse through any chain of Send/MultiSend nodes to find the true type/origin — used for coloring, labeling, and the "Connect to Send" dropdown contents.</p>
+      </div>
+
+      <div class="arch-note">
+        <span class="tag">Paste survival</span>
+        <p>Every node writes its live slot-to-origin mapping into <code>properties.hiddenLinkSlotMemory</code> every frame it has a real link (before any <code>collapsed</code> early-return, so it stays fresh even collapsed). On <code>onAdded</code>, if a slot has no real link yet, it's reconnected from that memory. This must run in a microtask (<code>Promise.resolve().then()</code>), not synchronously and not via <code>setTimeout(0)</code>: ComfyUI's paste path calls <code>graph.add(node)</code> (which fires <code>onAdded</code>) before <code>node.configure(data)</code> restores <code>properties</code>, and the per-frame auto-trim of empty slots runs on the very next render frame — a microtask is the only timing that reliably lands after both.</p>
+      </div>
+
+      <div class="arch-note">
+        <span class="tag">Bulk-op guards</span>
+        <p>Auto-spawn-on-add (Send/MultiSend) must not fire during a workflow load, undo/redo, or subgraph unpack — those already restore links correctly on their own. Checked via <code>app.configuringGraph</code> (covers load/undo/redo) plus a manual <code>insideHiddenLinkUnpack</code> flag (covers <code>unpackSubgraph</code>, which restores nodes via per-node <code>configure()</code> and never sets <code>configuringGraph</code>). Check any new bulk graph operation ComfyUI adds against this same gap before assuming the existing guard covers it.</p>
+      </div>
+
+      <div class="arch-note">
+        <span class="tag">Live-follow</span>
+        <p>A freshly auto-spawned Receive/MultiReceive tracks its Send's position every frame until the user grabs it — detachment triggers on <code>onMouseDown</code> (the moment it's grabbed) rather than waiting for drag-end, and is confirmed via an instance-level <code>onNodeMoved</code> patch on <code>app.canvas</code> once the drag finishes.</p>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Testing</span>
+        <p>No automated test suite — this is graph/canvas UI verified by manual testing in a running ComfyUI instance (see the project's <code>TASK_PROGRESS.md</code> for the full history if you have access to it).</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <span>No Messy Link — ComfyUI custom node pack</span>
+  <span class="mono">docs generated from README.md</span>
+</footer>
+
+<script>
+(function(){
+  try{
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    function onScroll(){
+      var pos = window.scrollY + 120;
+      var current = sections[0];
+      sections.forEach(function(sec){ if (sec.offsetTop <= pos) current = sec; });
+      links.forEach(function(a){
+        var target = document.querySelector(a.getAttribute('href'));
+        a.classList.toggle('active', target === current);
+      });
+    }
+    document.addEventListener('scroll', onScroll, { passive:true });
+    onScroll();
+  }catch(e){}
+})();
+</script>
