@@ -2,6 +2,16 @@
 
 ---
 
+## Repo Visibility
+
+This repo is public on GitHub (public install/distribution). `TASKS.md`,
+`TASK_PROGRESS.md`, and `SESSION_MEMORY.md` are personal dev-process files —
+gitignored, not tracked in the public repo (removed 2026-09-20). They still
+exist locally and are read/updated per the workflow below as normal; only
+`git add`/push to the public remote excludes them.
+
+---
+
 ## "Start" Command
 
 If the user types **"Start"**, you must:
