@@ -25,10 +25,10 @@ class AnyType(str):
 any_type = AnyType("*")
 
 
-class NoMessyLinkSend:
-    """Feeds a value into a hidden connection. Pair with a NoMessyLinkReceive
-    node; the link between them is drawn only while one of the pair is
-    hovered on the canvas (see web/no_messy_link.js)."""
+class SideeNoMessyLinkSend:
+    """Feeds a value into a hidden connection. Pair with a
+    SideeNoMessyLinkReceive node; the link between them is drawn only while
+    one of the pair is hovered on the canvas (see web/no_messy_link.js)."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -43,9 +43,9 @@ class NoMessyLinkSend:
         return (value,)
 
 
-class NoMessyLinkReceive:
-    """Outputs the value fed into the paired NoMessyLinkSend node. See
-    NoMessyLinkSend for the pairing behavior."""
+class SideeNoMessyLinkReceive:
+    """Outputs the value fed into the paired SideeNoMessyLinkSend node. See
+    SideeNoMessyLinkSend for the pairing behavior."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -75,10 +75,11 @@ def _multi_slot_name(i):
     return f"value_{i}"
 
 
-class NoMessyLinkMultiSend:
+class SideeNoMessyLinkMultiSend:
     """Feeds up to MULTI_MAX_SLOTS distinct values into hidden connections,
-    one per slot. Pair with NoMessyLinkMultiReceive (mirrors every connected
-    slot) or NoMessyLinkReceive (picks one slot — see web/no_messy_link.js)."""
+    one per slot. Pair with SideeNoMessyLinkMultiReceive (mirrors every
+    connected slot) or SideeNoMessyLinkReceive (picks one slot — see
+    web/no_messy_link.js)."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -93,9 +94,10 @@ class NoMessyLinkMultiSend:
         return tuple(kwargs.get(_multi_slot_name(i)) for i in range(1, MULTI_MAX_SLOTS + 1))
 
 
-class NoMessyLinkMultiReceive:
+class SideeNoMessyLinkMultiReceive:
     """Mirrors every currently-connected slot of its paired
-    NoMessyLinkMultiSend. See NoMessyLinkMultiSend for slot behavior."""
+    SideeNoMessyLinkMultiSend. See SideeNoMessyLinkMultiSend for slot
+    behavior."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -110,12 +112,13 @@ class NoMessyLinkMultiReceive:
         return tuple(kwargs.get(_multi_slot_name(i)) for i in range(1, MULTI_MAX_SLOTS + 1))
 
 
-class NoMessyLinkMixReceive:
-    """Task 7 — auto-expanding value slots like NoMessyLinkMultiReceive, but
-    each slot is wired independently (potentially to a different source
-    each — a plain NoMessyLinkSend or one specific NoMessyLinkMultiSend slot)
-    instead of mirroring one single MultiSend. Always added standalone, no
-    pairing/auto-spawn. See web/no_messy_link.js for the slot behavior."""
+class SideeNoMessyLinkMixReceive:
+    """Task 7 — auto-expanding value slots like SideeNoMessyLinkMultiReceive,
+    but each slot is wired independently (potentially to a different source
+    each — a plain SideeNoMessyLinkSend or one specific
+    SideeNoMessyLinkMultiSend slot) instead of mirroring one single
+    MultiSend. Always added standalone, no pairing/auto-spawn. See
+    web/no_messy_link.js for the slot behavior."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -131,17 +134,17 @@ class NoMessyLinkMixReceive:
 
 
 NODE_CLASS_MAPPINGS = {
-    "NoMessyLinkSend": NoMessyLinkSend,
-    "NoMessyLinkReceive": NoMessyLinkReceive,
-    "NoMessyLinkMultiSend": NoMessyLinkMultiSend,
-    "NoMessyLinkMultiReceive": NoMessyLinkMultiReceive,
-    "NoMessyLinkMixReceive": NoMessyLinkMixReceive,
+    "sidee_no_messy_link_send": SideeNoMessyLinkSend,
+    "sidee_no_messy_link_receive": SideeNoMessyLinkReceive,
+    "sidee_no_messy_link_multi_send": SideeNoMessyLinkMultiSend,
+    "sidee_no_messy_link_multi_receive": SideeNoMessyLinkMultiReceive,
+    "sidee_no_messy_link_mix_receive": SideeNoMessyLinkMixReceive,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "NoMessyLinkSend": "No Messy Link (Send)",
-    "NoMessyLinkReceive": "No Messy Link (Receive)",
-    "NoMessyLinkMultiSend": "No Messy Link (MultiSend)",
-    "NoMessyLinkMultiReceive": "No Messy Link (MultiReceive)",
-    "NoMessyLinkMixReceive": "No Messy Link (MixReceive)",
+    "sidee_no_messy_link_send": "sidee_no_messy_link_send",
+    "sidee_no_messy_link_receive": "sidee_no_messy_link_receive",
+    "sidee_no_messy_link_multi_send": "sidee_no_messy_link_multi_send",
+    "sidee_no_messy_link_multi_receive": "sidee_no_messy_link_multi_receive",
+    "sidee_no_messy_link_mix_receive": "sidee_no_messy_link_mix_receive",
 }

@@ -14,8 +14,8 @@
 
 import { app } from "../../scripts/app.js";
 
-const SEND_TYPE = "NoMessyLinkSend";
-const RECEIVE_TYPE = "NoMessyLinkReceive";
+const SEND_TYPE = "sidee_no_messy_link_send";
+const RECEIVE_TYPE = "sidee_no_messy_link_receive";
 const NODE_TYPES = [SEND_TYPE, RECEIVE_TYPE];
 
 // Task 6 — multi-slot pair, registered separately from the pair above.
@@ -24,14 +24,14 @@ const NODE_TYPES = [SEND_TYPE, RECEIVE_TYPE];
 // one specific MultiSend slot instead of a plain Send — that ability was
 // prototyped as a separate copy, NoMessyLinkReceiveV2, then merged into
 // NoMessyLinkReceive once verified and retired (see TASKS.md Task 6).
-const MULTI_SEND_TYPE = "NoMessyLinkMultiSend";
-const MULTI_RECEIVE_TYPE = "NoMessyLinkMultiReceive";
+const MULTI_SEND_TYPE = "sidee_no_messy_link_multi_send";
+const MULTI_RECEIVE_TYPE = "sidee_no_messy_link_multi_receive";
 const MULTI_MAX_SLOTS = 20;
 
 // Task 7 — mix-and-match receiver: auto-expanding slots like MultiSend, but
 // each slot picks its own independent source (plain Send or one MultiSend
 // slot) instead of mirroring a single MultiSend. Always standalone.
-const MIX_RECEIVE_TYPE = "NoMessyLinkMixReceive";
+const MIX_RECEIVE_TYPE = "sidee_no_messy_link_mix_receive";
 
 function multiSlotName(i) {
     return `value_${i}`;
