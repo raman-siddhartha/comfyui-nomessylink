@@ -19,9 +19,8 @@ engine still handles execution order and workflow saving normally.
 2. Restart the ComfyUI server (new node types only register at startup — a
    browser refresh alone is not enough).
 3. The nodes appear under the **utils/no_messy_link** category in the node
-   search, named `sidee_no_messy_link_send`, `sidee_no_messy_link_receive`,
-   `sidee_no_messy_link_multi_send`, `sidee_no_messy_link_multi_receive`,
-   `sidee_no_messy_link_mix_receive`.
+   search, named `Sidee: No Messy Link (Send)`, `(Receive)`, `(MultiSend)`,
+   `(MultiReceive)`, `(MixReceive)`.
 
 No Python dependencies beyond ComfyUI itself.
 
@@ -29,7 +28,7 @@ No Python dependencies beyond ComfyUI itself.
 
 ## Node types
 
-### sidee_no_messy_link_send / sidee_no_messy_link_receive
+### Sidee: No Messy Link (Send) / (Receive)
 One value in, one value out, one hidden link between them.
 
 - Add a **Send** node and a paired **Receive** node is auto-created and
@@ -55,7 +54,7 @@ One value in, one value out, one hidden link between them.
   Receive at any time (e.g. to recover one you deleted, or add another for
   fan-out), independent of the auto-spawn-on-add behavior.
 
-### sidee_no_messy_link_multi_send / sidee_no_messy_link_multi_receive
+### Sidee: No Messy Link (MultiSend) / (MultiReceive)
 Like Send/Receive, but one node carries **several independent value slots**
 (`value_1`, `value_2`, …), each its own hidden link with its own type — not
 one value fanned out. Slots auto-expand: connect the last empty slot and a
@@ -70,7 +69,7 @@ removed. Capped at 20 slots.
 - MultiSend has a **"+ New MultiReceive"** recovery button, same purpose as
   Send's.
 
-### sidee_no_messy_link_mix_receive
+### Sidee: No Messy Link (MixReceive)
 An auto-expanding multi-slot receiver like MultiReceive, but each slot is
 wired **independently** — potentially to a different source each (a plain
 Send, or one specific slot of any MultiSend). No pairing, no auto-spawn:

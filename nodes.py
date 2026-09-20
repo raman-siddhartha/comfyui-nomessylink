@@ -142,9 +142,9 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "sidee_no_messy_link_send": "sidee_no_messy_link_send",
-    "sidee_no_messy_link_receive": "sidee_no_messy_link_receive",
-    "sidee_no_messy_link_multi_send": "sidee_no_messy_link_multi_send",
-    "sidee_no_messy_link_multi_receive": "sidee_no_messy_link_multi_receive",
-    "sidee_no_messy_link_mix_receive": "sidee_no_messy_link_mix_receive",
+    "sidee_no_messy_link_send": "Sidee: No Messy Link (Send)",
+    "sidee_no_messy_link_receive": "Sidee: No Messy Link (Receive)",
+    "sidee_no_messy_link_multi_send": "Sidee: No Messy Link (MultiSend)",
+    "sidee_no_messy_link_multi_receive": "Sidee: No Messy Link (MultiReceive)",
+    "sidee_no_messy_link_mix_receive": "Sidee: No Messy Link (MixReceive)",
 }

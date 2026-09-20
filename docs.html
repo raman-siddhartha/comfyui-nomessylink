@@ -413,7 +413,7 @@
       <ol class="steps">
         <li><p>Copy this folder into your ComfyUI <code>custom_nodes/</code> directory.</p></li>
         <li><p>Restart the ComfyUI server — new node types only register at startup, a browser refresh alone is not enough.</p></li>
-        <li><p>The nodes appear under the <strong>utils/no_messy_link</strong> category in the node search, named <code>sidee_no_messy_link_send</code>, <code>sidee_no_messy_link_receive</code>, <code>sidee_no_messy_link_multi_send</code>, <code>sidee_no_messy_link_multi_receive</code>, <code>sidee_no_messy_link_mix_receive</code>.</p></li>
+        <li><p>The nodes appear under the <strong>utils/no_messy_link</strong> category in the node search, named <code>Sidee: No Messy Link (Send)</code>, <code>(Receive)</code>, <code>(MultiSend)</code>, <code>(MultiReceive)</code>, <code>(MixReceive)</code>.</p></li>
       </ol>
       <p>No Python dependencies beyond ComfyUI itself.</p>
     </section>
@@ -421,7 +421,7 @@
     <section id="send-receive">
       <h2>Node types</h2>
 
-      <h3 class="node-heading send"><span class="swatch"></span>sidee_no_messy_link_send / sidee_no_messy_link_receive</h3>
+      <h3 class="node-heading send"><span class="swatch"></span>Sidee: No Messy Link (Send) / (Receive)</h3>
       <p class="section-intro">One value in, one value out, one hidden link between them.</p>
       <ul>
         <li>Add a <strong>Send</strong> node and a paired <strong>Receive</strong> node is auto-created and auto-connected 220px to its right — no manual wiring needed for the common case.</li>
@@ -436,7 +436,7 @@
     </section>
 
     <section id="multi">
-      <h3 class="node-heading multi"><span class="swatch"></span>sidee_no_messy_link_multi_send / sidee_no_messy_link_multi_receive</h3>
+      <h3 class="node-heading multi"><span class="swatch"></span>Sidee: No Messy Link (MultiSend) / (MultiReceive)</h3>
       <p class="section-intro">Like Send/Receive, but one node carries several independent value slots (<code>value_1</code>, <code>value_2</code>, …), each its own hidden link with its own type — not one value fanned out.</p>
       <ul>
         <li>Slots auto-expand: connect the last empty slot and a new empty one appears below it; disconnect it and the trailing empty slot is removed. Capped at 20 slots.</li>
@@ -447,7 +447,7 @@
     </section>
 
     <section id="mix">
-      <h3 class="node-heading mix"><span class="swatch"></span>sidee_no_messy_link_mix_receive</h3>
+      <h3 class="node-heading mix"><span class="swatch"></span>Sidee: No Messy Link (MixReceive)</h3>
       <p class="section-intro">An auto-expanding multi-slot receiver like MultiReceive, but each slot is wired independently — potentially to a different source each (a plain Send, or one specific slot of any MultiSend). No pairing, no auto-spawn: always added standalone.</p>
       <ul>
         <li>One "Connect to Send" dropdown fills whichever slot is currently the trailing empty one; picking an entry repeatedly fills slots one at a time.</li>

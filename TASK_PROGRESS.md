@@ -101,12 +101,16 @@ Tasks 1–10 complete and closed out (2026-09-16). Next: not yet specified.
 
 ## Notes & Decisions Log
 
-- 2026-09-20: All 5 node ids/classes/display names renamed with a `sidee_`
-  prefix (NoMessyLinkSend → sidee_no_messy_link_send, etc. — id, Python class,
-  and display name all match) at user request, same pattern applied to the
-  textblock-merge project's TextBlock node. Breaks any already-saved workflow
-  JSON referencing the old class_type strings (those nodes will show as
+- 2026-09-20: All 5 node ids/classes renamed with a `sidee_` prefix
+  (NoMessyLinkSend → sidee_no_messy_link_send, etc. — id and Python class
+  match) at user request, same pattern applied to the textblock-merge
+  project's TextBlock node. Breaks any already-saved workflow JSON
+  referencing the old class_type strings (those nodes will show as
   missing/red on load) — accepted trade-off, confirmed by user.
+- 2026-09-20: Display names changed separately from ids — menu label is now
+  `Sidee: No Messy Link (Send)` / `(Receive)` / `(MultiSend)` /
+  `(MultiReceive)` / `(MixReceive)`, ids/classes stay snake_case
+  (sidee_no_messy_link_send etc.), unaffected by this change.
 - 2026-09-15: Project docs (CLAUDE.md, CLAUDE-WORKFLOW.md, TASKS.md,
   TASK_PROGRESS.md, SESSION_MEMORY.md) set up, modeled on the workflow structure of
   a prior project's CLAUDE.md (People Remover app) at the user's request. Split into
