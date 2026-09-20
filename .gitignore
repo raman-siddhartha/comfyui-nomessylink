@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# Internal dev-process files — kept local only, not published to the public repo
+SESSION_MEMORY.md
+TASKS.md
+TASK_PROGRESS.md
