@@ -105,6 +105,24 @@ always added standalone.
   `Output Not Connected ·` depending on which side is missing.
 - Fully connected: normal type-driven coloring as described above.
 
+## Keyboard shortcuts
+
+Select a node on canvas first, then press the shortcut. Both are no-ops
+while typing in a text field, and neither has any conflict with ComfyUI's
+own default keybindings.
+
+- **Alt+S** — select a **Receive** or **MultiReceive** and press Alt+S:
+  jumps straight to its parent Send. One press, no popup.
+- **Alt+R** — hold **Alt**, tap **R** (Alt only needs to still be held
+  *after* R, not necessarily before): pops up a small list next to your
+  cursor. Keep Alt held and click an entry to jump to it; release Alt
+  first and the list closes with no jump.
+  - From a **Send**/**MultiSend** — lists every Receive it currently feeds.
+  - From a **Receive**/**MultiReceive** — lists its *sibling* Receives (every
+    other Receive fed by the same parent Send), so you can hop sideways
+    without going back through the Send first.
+  - From a **MixReceive** — lists every distinct source feeding its slots.
+
 ## Copy/paste and saved workflows
 
 - Cutting/copying and pasting a Send, Receive, MultiSend, MultiReceive, or

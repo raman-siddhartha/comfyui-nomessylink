@@ -1738,3 +1738,155 @@ LGraph.prototype.unpackSubgraph = function (...args) {
         insideNoMessyLinkUnpack = false;
     }
 };
+
+// Task 11 — Alt+S / Alt+R keyboard jump shortcuts. Confirmed (2026-09-29,
+// checked the installed ComfyUI frontend bundle's keybinding service/core
+// commands) that neither key has an existing default binding.
+//
+// Alt+S: press-and-release, no hold needed — jumps a selected
+// Receive/MultiReceive straight to its parent Send, same as any other
+// button/dropdown jump in this file. MixReceive excluded (no single parent).
+//
+// Alt+R: tap R while Alt is still held down (Alt does not need to be held
+// down WHEN R is pressed and released — it just has to still be down
+// afterward) — pops up a small list next to the mouse cursor. The list stays
+// open only while Alt remains held; releasing Alt (or losing window focus)
+// before clicking closes it with no jump. Clicking an entry jumps to it and
+// closes the list. Works from Send/MultiSend (list = its paired Receives),
+// Receive/MultiReceive (list = its PARENT Send's paired Receives — lets you
+// jump sideways to a sibling Receive in a fan-out without first hopping back
+// to the Send), and MixReceive (list = its unique connected origins, reusing
+// the same per-origin dedup already built for its own jump buttons).
+
+// The currently-selected node matching one of the given types, or null.
+// app.canvas.selected_nodes is an {id: node} map kept live by the canvas —
+// same source of truth as everywhere else in this file that needs "the
+// node the user is pointing at" (see node_over usage above for the hover
+// equivalent).
+function getSelectedNodeOfType(types) {
+    const selected = app.canvas?.selected_nodes;
+    if (!selected) return null;
+    for (const id in selected) {
+        const node = selected[id];
+        if (node && types.includes(node.type)) return node;
+    }
+    return null;
+}
+
+// Every Receive-like node paired to a Send/MultiSend. getPairedReceives
+// already only returns RECEIVE_TYPE nodes (MixReceive slots don't come
+// through a Send's own output link); getMultiSendDownstream is filtered
+// down to MULTI_RECEIVE_TYPE/RECEIVE_TYPE here to drop any MixReceive
+// entries it also reports (a MixReceive picking one MultiSend slot is not a
+// "paired Receive").
+function getPairedReceiveList(node) {
+    if (node.type === SEND_TYPE) return getPairedReceives(node);
+    if (node.type === MULTI_SEND_TYPE) {
+        return getMultiSendDownstream(node)
+            .map((d) => d.target)
+            .filter((t) => t?.type === RECEIVE_TYPE || t?.type === MULTI_RECEIVE_TYPE);
+    }
+    return [];
+}
+
+// The Alt+R popup's entries for whichever node type is selected.
+function getAltRPopupTargets(node) {
+    if (node.type === SEND_TYPE || node.type === MULTI_SEND_TYPE) {
+        return getPairedReceiveList(node);
+    }
+    if (node.type === RECEIVE_TYPE) {
+        const send = getPairedSend(node);
+        return send ? getPairedReceiveList(send) : [];
+    }
+    if (node.type === MULTI_RECEIVE_TYPE) {
+        const send = findNodeByIdLoose(node.graph, node.properties?.pairedMultiSendId);
+        return send?.type === MULTI_SEND_TYPE ? getPairedReceiveList(send) : [];
+    }
+    if (node.type === MIX_RECEIVE_TYPE) {
+        return gatherUniqueOriginEntries(node).map((e) => e.node);
+    }
+    return [];
+}
+
+let lastMouseX = 0;
+let lastMouseY = 0;
+document.addEventListener("mousemove", (e) => {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+});
+
+let altRPopupEl = null;
+function closeAltRPopup() {
+    if (!altRPopupEl) return;
+    altRPopupEl.remove();
+    altRPopupEl = null;
+}
+
+function openAltRPopup(targets) {
+    closeAltRPopup();
+    const el = document.createElement("div");
+    el.style.cssText =
+        "position:fixed; z-index:10000; background:#242424; border:1px solid #555; " +
+        "border-radius:4px; padding:4px; font:12px sans-serif; color:#eee; " +
+        "min-width:160px; max-height:260px; overflow-y:auto; box-shadow:0 2px 8px rgba(0,0,0,0.5);";
+    el.style.left = `${lastMouseX + 8}px`;
+    el.style.top = `${lastMouseY + 8}px`;
+    for (const target of targets) {
+        const row = document.createElement("div");
+        row.textContent = target.title || `#${target.id}`;
+        row.style.cssText = "padding:4px 8px; cursor:pointer; white-space:nowrap; border-radius:3px;";
+        row.addEventListener("mouseenter", () => {
+            row.style.background = "#3a3a3a";
+        });
+        row.addEventListener("mouseleave", () => {
+            row.style.background = "";
+        });
+        // mousedown, not click: fires before the popup could be torn down by
+        // anything else racing on the same interaction.
+        row.addEventListener("mousedown", (ev) => {
+            ev.preventDefault();
+            jumpToNode(target);
+            closeAltRPopup();
+        });
+        el.appendChild(row);
+    }
+    document.body.appendChild(el);
+    altRPopupEl = el;
+}
+
+// Losing Alt (keyup) or window focus entirely (alt-tab away mid-hold) both
+// close the popup with no jump, per spec — a stuck popup with no way to
+// dismiss it otherwise would be a real annoyance.
+document.addEventListener("keyup", (e) => {
+    if (e.key === "Alt") closeAltRPopup();
+});
+window.addEventListener("blur", closeAltRPopup);
+
+document.addEventListener("keydown", (e) => {
+    if (!e.altKey) return;
+    const key = e.key?.toLowerCase();
+    if (key !== "s" && key !== "r") return;
+    // Standing rule (root CLAUDE.md): keyboard shortcuts only fire when no
+    // input field is focused.
+    const activeTag = document.activeElement?.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+
+    if (key === "s") {
+        const receive = getSelectedNodeOfType([RECEIVE_TYPE, MULTI_RECEIVE_TYPE]);
+        if (!receive) return;
+        const send =
+            receive.type === RECEIVE_TYPE
+                ? getPairedSend(receive)
+                : findNodeByIdLoose(receive.graph, receive.properties?.pairedMultiSendId);
+        if (!send || (send.type !== SEND_TYPE && send.type !== MULTI_SEND_TYPE)) return;
+        e.preventDefault();
+        jumpToNode(send);
+    } else {
+        const node = getSelectedNodeOfType([SEND_TYPE, MULTI_SEND_TYPE, RECEIVE_TYPE, MULTI_RECEIVE_TYPE, MIX_RECEIVE_TYPE]);
+        if (!node) return;
+        const targets = getAltRPopupTargets(node);
+        if (!targets.length) return;
+        e.preventDefault();
+        openAltRPopup(targets);
+    }
+});
